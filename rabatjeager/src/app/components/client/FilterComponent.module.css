@@ -1,0 +1,22 @@
+.priceRangeLabel {
+    padding-bottom: 20px; /* Customize the padding as needed */
+}
+
+.priceRangeLabel label  {
+    font-weight: bold;     /* Bold text */
+    font-size: 1.2rem;      /* Font size */
+}
+
+
+.Separator {
+    margin-top: auto; /* Space above the separator */
+    margin-bottom: 10px; /* Space below the separator */
+    border-bottom: 3px solid #ccc; /* Add a border */
+}
+
+.moveButton {
+    cursor: pointer;       /* Change the cursor to a pointer */
+    width: 100%; /* Ensures the button stretches full width */
+    padding: 10px; /* Padding around the text */
+}
+
