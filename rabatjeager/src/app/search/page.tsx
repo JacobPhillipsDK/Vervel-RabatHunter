@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import FilterComponent from '../components/client/FilterComponent';
 import ProductCard from '../components/client/product-card';
@@ -47,7 +47,7 @@ function generateProducts(numItems: number): Product[] {
     return products;
 }
 
-export default function SearchPage() {
+function SearchPageContent() {
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [price, setPrice] = useState<number>(250);
@@ -137,5 +137,13 @@ export default function SearchPage() {
                 </Card>
             </div>
         </div>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <SearchPageContent />
+        </Suspense>
     );
 }
