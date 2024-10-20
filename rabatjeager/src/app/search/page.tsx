@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import FilterComponent from '../components/client/FilterComponent';
 import ProductCard from '../components/client/product-card';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 interface Product {
     id: number;
@@ -36,7 +36,7 @@ function generateProducts(numItems: number): Product[] {
         products.push({
             id: i,
             name: `Product ${i}`,
-            description: `This is a brief description for Product ${i}`, // Adding descriptions
+            description: `This is a brief description for Product ${i}`,
             price: price,
             originalPrice: originalPrice,
             discount: discount,
@@ -48,19 +48,26 @@ function generateProducts(numItems: number): Product[] {
 }
 
 export default function SearchPage() {
-    // Use the Product type for the useState hook
-    const [products, setProducts] = useState<Product[]>([]); // Correct type for product state
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]); // Correct type for filtered products
-    const [price, setPrice] = useState<number>(250); // Default to max price
+    const [products, setProducts] = useState<Product[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+    const [price, setPrice] = useState<number>(250);
     const [selectedStore, setSelectedStore] = useState<string>("All Stores");
-    const [searchTerm, setSearchTerm] = useState<string>(""); // Add search term state
+    const [searchTerm, setSearchTerm] = useState<string>("");
 
-    // Run product generation on client-side only
+    const searchParams = useSearchParams();
+
     useEffect(() => {
         const generatedProducts = generateProducts(100);
         setProducts(generatedProducts);
-        setFilteredProducts(generatedProducts); // Initialize filtered products with all products
+        setFilteredProducts(generatedProducts);
     }, []);
+
+    useEffect(() => {
+        const searchTermParam = searchParams.get('searchTerm') || "";
+        const selectedStoreParam = searchParams.get('selectedStore') || "All Stores";
+        setSearchTerm(searchTermParam);
+        setSelectedStore(selectedStoreParam);
+    }, [searchParams]);
 
     useEffect(() => {
         const filtered = products.filter((product) => {
@@ -73,7 +80,7 @@ export default function SearchPage() {
             return matchesStore && matchesPrice && matchesSearchTerm;
         });
         setFilteredProducts(filtered);
-    }, [price, selectedStore, searchTerm, products]); // Include searchTerm and products in dependency array
+    }, [price, selectedStore, searchTerm, products]);
 
     const handlePriceChange = (newPrice: number) => {
         setPrice(newPrice);
@@ -84,13 +91,13 @@ export default function SearchPage() {
     };
 
     const handleSearchChange = (searchTerm: string) => {
-        setSearchTerm(searchTerm); // Update search term
+        setSearchTerm(searchTerm);
     };
 
     const handleClearFilter = () => {
-        setPrice(250); // Reset to max price
-        setSelectedStore("All Stores"); // Reset to all stores
-        setSearchTerm(""); // Reset search term
+        setPrice(250);
+        setSelectedStore("All Stores");
+        setSearchTerm("");
     };
 
     return (
@@ -103,7 +110,8 @@ export default function SearchPage() {
                         onPriceChange={handlePriceChange}
                         onStoreChange={handleStoreChange}
                         onClearFilter={handleClearFilter}
-                        onSearchChange={handleSearchChange} // Pass down the search handler
+                        onSearchChange={handleSearchChange}
+                        initialSearchTerm={searchTerm}
                     />
                 </div>
                 <Card className="flex-grow max-w-[3440px] flex flex-col">
@@ -127,7 +135,6 @@ export default function SearchPage() {
                         </ScrollArea>
                     </CardContent>
                 </Card>
-
             </div>
         </div>
     );

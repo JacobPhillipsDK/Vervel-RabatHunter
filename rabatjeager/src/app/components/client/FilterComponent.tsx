@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,7 +9,7 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
 import {
     Card,
     CardContent,
@@ -17,11 +17,8 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-
-
 
 interface FilterComponentProps {
     defaultPrice: number;
@@ -29,10 +26,9 @@ interface FilterComponentProps {
     onPriceChange: (newPrice: number) => void;
     onStoreChange: (newStore: string) => void;
     onClearFilter: () => void;
-    onSearchChange: (searchTerm: string) => void; // Add search term prop
+    onSearchChange: (searchTerm: string) => void;
+    initialSearchTerm: string;
 }
-
-
 
 const FilterComponent: React.FC<FilterComponentProps> = ({
                                                              defaultPrice,
@@ -40,11 +36,21 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                                                              onPriceChange,
                                                              onStoreChange,
                                                              onClearFilter,
-                                                             onSearchChange, // Destructure new prop
+                                                             onSearchChange,
+                                                             initialSearchTerm,
                                                          }) => {
     const [price, setPrice] = useState<number>(defaultPrice);
     const [selectedStore, setSelectedStore] = useState<string>(defaultStore);
+    const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm);
     const maxPrice = 250;
+
+    useEffect(() => {
+        setSearchTerm(initialSearchTerm);
+    }, [initialSearchTerm]);
+
+    useEffect(() => {
+        setSelectedStore(defaultStore);
+    }, [defaultStore]);
 
     const handlePriceChange = (value: number[]): void => {
         setPrice(value[0]);
@@ -59,15 +65,14 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     const handleClear = (): void => {
         setPrice(defaultPrice);
         setSelectedStore(defaultStore);
+        setSearchTerm("");
         onClearFilter();
     };
-
-    const [searchTerm, setSearchTerm] = useState<string>(""); // State for search term
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setSearchTerm(value);
-        onSearchChange(value); // Pass search term to parent component
+        onSearchChange(value);
     };
 
     return (
@@ -84,7 +89,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                             className="w-full p-2 border border-gray-300 rounded-lg"
                             placeholder="Search by name or description"
                             value={searchTerm}
-                            onChange={handleSearchChange} // Update search term on change
+                            onChange={handleSearchChange}
                         />
                     </div>
                     <div>
@@ -108,7 +113,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                         <CardDescription className="mb-4">Select what store you want to filter after</CardDescription>
                         <Select value={selectedStore} onValueChange={handleStoreChange}>
                             <SelectTrigger id="store-select" className="w-full">
-                                <SelectValue placeholder="Select stores"/>
+                                <SelectValue placeholder="Select stores" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="All Stores">All Stores</SelectItem>
@@ -126,7 +131,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button variant="default" onClick={handleClear} className="w-full">
-                            Clear Filter
+                                Clear Filter
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
