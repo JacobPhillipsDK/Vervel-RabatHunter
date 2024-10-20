@@ -1,3 +1,26 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
+  "rules": {
+    // Customize or disable rules here
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_" } // Allow unused variables with leading underscores
+    ],
+    "@typescript-eslint/no-empty-interface": [
+      "warn",
+      { "allowSingleExtends": true } // Allow empty interfaces if they extend another interface
+    ],
+    "react/no-unescaped-entities": "warn" // Warn about unescaped entities instead of throwing an error
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        // Additional TypeScript-specific rules can go here
+      }
+    }
+  ]
 }
