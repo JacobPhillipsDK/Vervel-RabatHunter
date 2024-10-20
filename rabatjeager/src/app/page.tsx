@@ -22,15 +22,6 @@ export default function Home() {
                         <CircleAlert size={28} strokeWidth={3} />
                         <AlertTitle>Heads up!</AlertTitle>
                         <AlertDescription>
-                            This is a demo project currently limited to  <strong>
-                            Aalborg City
-                        </strong>
-                        </AlertDescription>
-                    </Alert>
-                    <Alert>
-                        <CircleAlert size={28} strokeWidth={3} />
-                        <AlertTitle>Heads up!</AlertTitle>
-                        <AlertDescription>
                             Currently, this project is not connected to a backend,<br /> so all the displayed data is being used as  &quot;placeholder &quot; information.
                         </AlertDescription>
                     </Alert>
