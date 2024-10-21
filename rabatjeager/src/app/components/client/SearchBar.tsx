@@ -21,9 +21,7 @@ export default function SearchBar() {
     }
 
     const handleSearch = () => {
-        if (searchTerm || selectedStore !== 'All Stores') {
-            router.push(`/search?searchTerm=${encodeURIComponent(searchTerm)}&selectedStore=${encodeURIComponent(selectedStore)}`)
-        }
+        router.push(`/search?searchTerm=${encodeURIComponent(searchTerm)}&selectedStore=${encodeURIComponent(selectedStore)}`)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

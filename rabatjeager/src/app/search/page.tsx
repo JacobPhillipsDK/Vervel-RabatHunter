@@ -8,8 +8,65 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
 
+interface Offer {
+    currency: string;
+    discount: number;
+    ean: string;
+    endTime: string;
+    lastUpdate: string;
+    newPrice: number;
+    originalPrice: number;
+    percentDiscount: number;
+    startTime: string;
+    stock: number;
+    stockUnit: string;
+}
+
 interface Product {
-    id: number;
+    categories: {
+        da?: string;
+        en?: string;
+    };
+    description: string;
+    ean: string;
+    image: string | null;
+}
+
+interface Clearance {
+    offer: Offer;
+    product: Product;
+}
+
+interface Store {
+    id: string;
+    address: {
+        city: string;
+        country: string;
+        extra: string | null;
+        street: string;
+        zip: string;
+    };
+    brand: string;
+    coordinates: [number, number];
+    hours: Array<{
+        date: string;
+        type: string;
+        open: string;
+        close: string;
+        closed: boolean;
+        customerFlow: number[];
+    }>;
+    name: string;
+    type: string;
+}
+
+interface StoreData {
+    clearances: Clearance[];
+    store: Store;
+}
+
+interface ProcessedProduct {
+    id: string;
     name: string;
     description: string;
     price: number;
@@ -19,37 +76,39 @@ interface Product {
     imageUrl: string;
 }
 
-const stores = ["Føtex", "Netto", "Bilka", "Salling"];
 const DEFAULT_IMAGE_URL = "/placeholder.png";
 
-function getRandomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+
+function normalizeStoreName(brand: string): string {
+    const storeNameMap: { [key: string]: string } = {
+        'foetex': 'Føtex',
+        'netto': 'Netto',
+        'bilka': 'Bilka',
+        'salling': 'Salling'
+    };
+    return storeNameMap[brand.toLowerCase()] || brand;
 }
 
-function generateProducts(numItems: number): Product[] {
-    const products: Product[] = [];
-    for (let i = 1; i <= numItems; i++) {
-        const price = getRandomInt(10, 50);
-        const originalPrice = price + getRandomInt(1, 85);
-        const discount = getRandomInt(5, 99);
-        const store = stores[getRandomInt(0, stores.length - 1)];
-        products.push({
-            id: i,
-            name: `Product ${i}`,
-            description: `This is a brief description for Product ${i}`,
-            price: price,
-            originalPrice: originalPrice,
-            discount: discount,
-            store: store,
-            imageUrl: DEFAULT_IMAGE_URL
-        });
-    }
-    return products;
+
+function processData(storeDataList: StoreData[]): ProcessedProduct[] {
+    return storeDataList.flatMap(storeData =>
+        storeData.clearances.map(clearance => ({
+            id: clearance.offer.ean,
+            name: clearance.product.description,
+            description: clearance.product.categories.en || clearance.product.categories.da || "",
+            price: clearance.offer.newPrice,
+            originalPrice: clearance.offer.originalPrice,
+            discount: clearance.offer.percentDiscount,
+            store: normalizeStoreName(storeData.store.brand),
+            endTime: clearance.offer.endTime,
+            imageUrl: clearance.product.image || DEFAULT_IMAGE_URL
+        }))
+    );
 }
 
 function SearchPageContent() {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<ProcessedProduct[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<ProcessedProduct[]>([]);
     const [price, setPrice] = useState<number>(250);
     const [selectedStore, setSelectedStore] = useState<string>("All Stores");
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -57,9 +116,17 @@ function SearchPageContent() {
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        const generatedProducts = generateProducts(100);
-        setProducts(generatedProducts);
-        setFilteredProducts(generatedProducts);
+        // Load products from JSON file
+        fetch('/response.json')
+            .then(response => response.json())
+            .then((data: StoreData[]) => {
+                const processedData = processData(data);
+                setProducts(processedData);
+                setFilteredProducts(processedData);
+                // const uniqueStores = Array.from(new Set(processedData.map(product => product.store)));
+                // setStores(['All Stores', ...uniqueStores]);
+            })
+            .catch(error => console.error('Error loading products:', error));
     }, []);
 
     useEffect(() => {

@@ -1,12 +1,12 @@
 "use client"
 
 import Image from 'next/image'
-import {useState} from 'react'
-import {TrendingUp, TrendingDown} from "lucide-react"
-import {CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis} from "recharts"
-import {Card, CardContent, CardFooter} from "@/components/ui/card"
-import {Badge} from "@/components/ui/badge"
-import {ScrollArea} from "@/components/ui/scroll-area"
+import { useState } from 'react'
+import { TrendingUp, TrendingDown } from "lucide-react"
+import { CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis } from "recharts"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Dialog,
     DialogContent,
@@ -30,7 +30,7 @@ interface ProductCardProps {
     imageUrl?: string
     imageSize?: number
     description?: string
-    expireDate?: string
+    endTime?: string
     priceHistory?: { date: string; price: number }[]
     dialogWidth?: 'sm' | 'md' | 'lg'
 }
@@ -44,12 +44,12 @@ function getRandomInt(max: number) {
 
 // Dummy data for the chart
 const dummyPriceHistory = [
-    {date: '2023-01-01', price: getRandomInt(100)},
-    {date: '2023-02-01', price: getRandomInt(100)},
-    {date: '2023-03-01', price: getRandomInt(100)},
-    {date: '2023-04-01', price: getRandomInt(100)},
-    {date: '2023-05-01', price: getRandomInt(100)},
-    {date: '2023-06-01', price: getRandomInt(100)},
+    { date: '2023-01-01', price: getRandomInt(100) },
+    { date: '2023-02-01', price: getRandomInt(100) },
+    { date: '2023-03-01', price: getRandomInt(100) },
+    { date: '2023-04-01', price: getRandomInt(100) },
+    { date: '2023-05-01', price: getRandomInt(100) },
+    { date: '2023-06-01', price: getRandomInt(100) },
 ]
 
 const chartConfig = {
@@ -70,9 +70,14 @@ export default function ProductCard({
                                         description = "No description available.",
                                         priceHistory = dummyPriceHistory,
                                         dialogWidth = 'sm',
-                                        expireDate = '2023-06-01'
+                                        endTime
                                     }: ProductCardProps) {
     const [isOpen, setIsOpen] = useState(false)
+    const [imgSrc, setImgSrc] = useState(imageUrl || DEFAULT_IMAGE_URL)
+
+    const handleError = () => {
+        setImgSrc(DEFAULT_IMAGE_URL)
+    }
 
     const priceTrend = priceHistory[priceHistory.length - 1].price - priceHistory[priceHistory.length - 2].price
     const trendPercentage = ((priceTrend / priceHistory[priceHistory.length - 2].price) * 100).toFixed(1)
@@ -83,25 +88,34 @@ export default function ProductCard({
         lg: 'sm:max-w-[700px]'
     }[dialogWidth]
 
+    const formattedEndTime = endTime ? new Date(endTime).toLocaleString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+    }) : 'N/A';
+
     return (
         <>
             <Card
                 className="overflow-hidden w-full cursor-pointer transition-shadow hover:shadow-lg"
-                style={{maxWidth: `${imageSize}px`}}
+                style={{ maxWidth: `${imageSize}px` }}
                 onClick={() => setIsOpen(true)}
             >
                 <CardContent className="p-0">
-                    <div className="relative" style={{width: `${imageSize}px`, height: `${imageSize}px`}}>
+                    <div className="relative" style={{ width: `${DEFAULT_IMAGE_SIZE}px`, height: `${DEFAULT_IMAGE_SIZE}px` }}>
                         <Image
-                            src={imageUrl || DEFAULT_IMAGE_URL}
+                            src={imgSrc}
                             alt={name}
                             fill
-                            sizes={`${imageSize}px`}
-                            className="object-cover"
+                            sizes={`${DEFAULT_IMAGE_SIZE}px`} // This helps with responsive sizing
+                            className="object-contain" // Use object-contain to maintain aspect ratio
+                            onError={handleError}
                         />
-                        {/* Expiration date using Badge */}
                         <Badge variant="secondary" className="absolute top-2 left-2 text-xs">
-                            Expires: {expireDate}
+                            Expires: {formattedEndTime}
                         </Badge>
                     </div>
                 </CardContent>
@@ -115,7 +129,7 @@ export default function ProductCard({
                         <span className="text-xs font-medium text-green-600">{discount}%</span>
                     </div>
                     <div>
-                        <span className="text-sm text-gray-500">{expireDate}</span>
+                        <span className="text-sm text-gray-500">{formattedEndTime}</span>
                     </div>
                     <div className="flex justify-between w-full mt-1">
                         <Badge variant="secondary" className="text-xs">{store}</Badge>
@@ -124,7 +138,7 @@ export default function ProductCard({
             </Card>
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent className={`${dialogSizeClass} max-h-[50vh] min-h-[650px] flex flex-col`}>
+                <DialogContent className={`${dialogSizeClass} max-h-[50vh] min-h-[700px] flex flex-col`}>
                     <ScrollArea className="flex-grow">
                         <DialogHeader>
                             <DialogTitle>{name}</DialogTitle>
@@ -133,11 +147,18 @@ export default function ProductCard({
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <Image
-                                    src={imageUrl || DEFAULT_IMAGE_URL}
+                                    src={imgSrc}
                                     alt={name}
-                                    width={200}
-                                    height={200}
-                                    className="w-full h-auto object-cover rounded-md"
+                                    width={DEFAULT_IMAGE_SIZE} // Use the constant for width
+                                    height={DEFAULT_IMAGE_SIZE} // Use the constant for height
+                                    className="w-full h-auto object-contain"
+                                    onError={handleError}
+                                    style={{
+                                        maxWidth: '100%', // Ensure it fits within the container
+                                        maxHeight: '250px',
+                                        width: 'auto',
+                                        height: 'auto',
+                                    }}
                                 />
                                 <div className="space-y-2">
                                     <div>
@@ -156,7 +177,7 @@ export default function ProductCard({
                                     </div>
                                     <div>
                                         <span className="font-bold">Expire date: </span>
-                                        <span className="text-sm text-gray-600">{expireDate}</span>
+                                        <span className="text-sm text-gray-600">{formattedEndTime}</span>
                                     </div>
                                     <div>
                                         <span className="font-bold">Description: </span>
@@ -177,13 +198,13 @@ export default function ProductCard({
                                                 bottom: 20,
                                             }}
                                         >
-                                            <CartesianGrid strokeDasharray="3 3"/>
+                                            <CartesianGrid strokeDasharray="3 3" />
                                             <XAxis
                                                 dataKey="date"
                                                 tickLine={false}
                                                 axisLine={false}
                                                 tickMargin={8}
-                                                tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', {month: 'short'})}
+                                                tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short' })}
                                             />
                                             <YAxis
                                                 tickLine={false}
@@ -192,7 +213,7 @@ export default function ProductCard({
                                             />
                                             <ChartTooltip
                                                 cursor={true}
-                                                content={<ChartTooltipContent indicator="line"/>}
+                                                content={<ChartTooltipContent indicator="line" />}
                                             />
                                             <Line
                                                 dataKey="price"
@@ -221,11 +242,12 @@ export default function ProductCard({
                                     <div className="flex gap-2 font-medium leading-none">
                                         {priceTrend >= 0 ? 'Trending up' : 'Trending down'} by {Math.abs(Number(trendPercentage))}%
                                         this month
-                                        {priceTrend >= 0 ? <TrendingUp className="h-4 w-4"/> :
-                                            <TrendingDown className="h-4 w-4"/>}
+                                        {priceTrend >= 0 ? <TrendingUp className="h-4 w-4" /> :
+                                            <TrendingDown className="h-4 w-4" />}
                                     </div>
                                     <div className="leading-none text-muted-foreground">
-                                        Showing price history for the last 6 months
+                                        Showing price history for the last 6 months <br />
+                                        This is a dummy data for the price history chart.
                                     </div>
                                 </CardFooter>
                             </Card>
