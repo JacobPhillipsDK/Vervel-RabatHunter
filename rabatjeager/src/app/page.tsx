@@ -23,8 +23,7 @@ export default function Home() {
                         <AlertTitle>Heads up!</AlertTitle>
                         <AlertDescription>
 						Food product items are in Danish; therefore, please search using Danish. <br />
-
-Currently, this project is not connected to a backend, so all displayed data is being used as &quot;placeholder &quot; information
+Currently, this project is not connected to a backend, <br /> so all displayed data is being used as &quot;placeholder &quot; information
                         </AlertDescription>
                     </Alert>
                 </div>
