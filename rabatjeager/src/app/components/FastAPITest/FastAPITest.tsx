@@ -27,7 +27,7 @@ export default function FastAPITest() {
 
         // Call fetchJoke immediately, then set interval
         fetchJoke()
-        const intervalId = setInterval(fetchJoke, 5000)
+        const intervalId = setInterval(fetchJoke, 10000)
 
         // Cleanup interval on component unmount
         return () => clearInterval(intervalId)
