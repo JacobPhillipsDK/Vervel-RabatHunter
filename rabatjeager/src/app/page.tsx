@@ -3,6 +3,8 @@ import SearchBar from './components/client/SearchBar';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CircleAlert } from 'lucide-react';
 
+import FastAPITest from './components/FastAPITest/FastAPITest';
+
 export default function Home() {
     return (
         <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
@@ -24,6 +26,13 @@ export default function Home() {
                         <AlertDescription>
 						Food product items are in Danish; therefore, please search using Danish. <br />
 Currently, this project is not connected to a backend, <br /> so all displayed data is being used as &quot;placeholder &quot; information
+                        </AlertDescription>
+                    </Alert>
+                    <Alert>
+                        <CircleAlert size={28} strokeWidth={3} />
+                        <AlertTitle>Serverless demo with fastapi</AlertTitle>
+                        <AlertDescription>
+                            <FastAPITest />
                         </AlertDescription>
                     </Alert>
                 </div>
